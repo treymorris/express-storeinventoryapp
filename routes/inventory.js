@@ -31,10 +31,10 @@ router.get('/products/:id/update', product_controller.product_update_get);
 router.post('/products/:id/update', product_controller.product_update_post);
 
 // GET request for one product.
-router.get('/products/:id', product_controller.products_detail);
+router.get('/products/:id', product_controller.product_detail);
 
 // GET request for list of all product items.
-router.get('/products', product_controller.products_list);
+router.get('/products', product_controller.product_list);
 
 
 /// Category ROUTES ///

@@ -12,7 +12,7 @@ var app = express();
 
 //Set up mongoose connection
 var mongoose = require('mongoose');
-var mongoDB = 'insert_your_database_url_here';
+var mongoDB = 'URL';
 mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true});
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
