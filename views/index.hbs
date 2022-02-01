@@ -1,2 +1,22 @@
-<h1>{{title}}</h1>
-<p>Welcome to {{title}}</p>
+<h1 class="text-center mb-3">{{title}}</h1>
+<p class="text-center mb-3">Welcome to {{title}}</p>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-2">
+            <ul class="sidebar-nav">
+                <li><a href="/inventory">Home</a></li>
+                <li><a href="/inventory/categories">Categories</a></li>
+                <li><a href="/inventory/products">Products</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<p>The inventory is as follows: </p>
+
+<ul>
+    <li>Products: {{this.data.product_count}}</li>
+    <li>Categories: {{this.data.category_count}}</li>
+</ul>
+
