@@ -19,7 +19,7 @@ exports.index = function(req, res) {
     });
 };
 
-// Display list of all books.
+// Display list of all products.
 exports.product_list = function(req, res, next) {
 
     Product.find({}, 'name')

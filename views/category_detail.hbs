@@ -1,0 +1,13 @@
+<h1>Category: {{category.name}}</h1>
+<div style="margin-left:20px; margin-top:20px">
+    <h4>Products</h4>
+    <ul class="list-group">
+        {{#if category_products}}
+                {{#each category_products}}
+                    <li class="list-group-item"><a href={{this.url}}>{{this.name}}</a></li>
+                {{/each}}
+            {{else}}
+            <li>There are no products in that category</li>
+        {{/if}}
+    </ul>
+</div>

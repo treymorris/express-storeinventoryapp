@@ -40,25 +40,25 @@ router.get('/products', product_controller.product_list);
 /// Category ROUTES ///
 
 // GET request for creating a category. NOTE This must come before route that displays category (uses id).
-router.get('/category/create', category_controller.category_create_get);
+router.get('/categories/create', category_controller.category_create_get);
 
 //POST request for creating category.
-router.post('/category/create', category_controller.category_create_post);
+router.post('/categories/create', category_controller.category_create_post);
 
 // GET request to delete category.
-router.get('/category/:id/delete', category_controller.category_delete_get);
+router.get('/categories/:id/delete', category_controller.category_delete_get);
 
 // POST request to delete category.
-router.post('/category/:id/delete', category_controller.category_delete_post);
+router.post('/categories/:id/delete', category_controller.category_delete_post);
 
 // GET request to update category.
-router.get('/category/:id/update', category_controller.category_update_get);
+router.get('/categories/:id/update', category_controller.category_update_get);
 
 // POST request to update category.
-router.post('/category/:id/update', category_controller.category_update_post);
+router.post('/categories/:id/update', category_controller.category_update_post);
 
 // GET request for one category.
-router.get('/category/:id', category_controller.category_detail);
+router.get('/categories/:id', category_controller.category_detail);
 
 // GET request for list of all category.
 router.get('/categories', category_controller.category_list);
