@@ -1,0 +1,26 @@
+<h1>{{title}}:  {{category.name}}</h1>
+
+
+  {{#if category_products.length}} 
+    <p>Delete the following products before attempting to delete this Category.</p>
+    <div style='margin-left:20px;margin-top:20px'>
+    <h4>Products</h4>
+        {{#each category_products}}
+            <ul>
+                <li><a href={{this.url}}>{{this.name}}</a></li>
+            </ul>
+        {{/each}}
+    </div>
+    {{else}}
+
+        <p>Do you really want to delete this Category?</p>
+    {{/if}}
+
+    <form method="POST" action="" class="mb-4">
+        <div class="form-group">
+        <input type="hidden" name="categoryid" class="form-control" required="true" value=categoryid>
+        </div>
+        <div class="text-center mb-3">
+            <input type="submit" value="Delete" class="btn-primary btn-block">
+        </div>
+    </form>
