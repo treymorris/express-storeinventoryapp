@@ -1,9 +1,9 @@
-<h1>Products: {{title}}</h1>
+<h1>{{title}}</h1>
 <div style="margin-left:20px; margin-top:20px">
-    <h4>Products</h4>
+    <h4>Details:</h4>
     <ul class="list-group">
-        {{#each product}}
-            <li class="list-group-item">{{this.name}}{{this.description}}</a></li>
-        {{/each}}
+        <li class="list-group-item">Description: {{this.product.description}}</li>
+        <li class="list-group-item">Price: {{this.product.price}}</li>
+        <li class="list-group-item">Quantity: {{this.product.quantityInStock}}</li>
     </ul>
 </div>

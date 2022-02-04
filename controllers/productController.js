@@ -34,8 +34,27 @@ exports.product_list = function(req, res, next) {
   };
 
 // Display detail page for a specific book.
-exports.product_detail = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book detail: ' + req.params.id);
+exports.product_detail = function(req, res, next) {
+
+    async.parallel({
+        product: function(callback) {
+
+            Product.findById(req.params.id)
+              .populate('category')
+              .exec(callback);
+        },
+        
+    }, function(err, results) {
+        if (err) { return next(err); }
+        if (results.product==null) { // No results.
+            var err = new Error('Book not found');
+            err.status = 404;
+            return next(err);
+        }
+        // Successful, so render.
+        res.render('product_detail', { title: results.product.name, product: results.product } );
+    });
+
 };
 
 // Display book create form on GET.
