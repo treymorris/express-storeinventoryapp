@@ -1,9 +1,7 @@
 var Product = require('../models/products');
-
 var Category = require('../models/categories');
-
-
 var async = require('async');
+const { body,validationResult } = require('express-validator');
 
 exports.index = function(req, res) {
 
@@ -58,14 +56,85 @@ exports.product_detail = function(req, res, next) {
 };
 
 // Display book create form on GET.
-exports.product_create_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book create GET');
+//exports.product_create_get = function(req, res) {
+//    res.send('NOT IMPLEMENTED: Book create GET');
+//};
+exports.product_create_get = function(req, res, next) {
+
+    // Get category, which we can use for adding to our product.
+    async.parallel({
+        
+        category: function(callback) {
+            Category.find(callback);
+        },
+    }, function(err, results) {
+        if (err) { return next(err); }
+        res.render('product_form', { title: 'Create Product', category: results.category });
+    });
+
 };
 
 // Handle book create on POST.
-exports.product_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book create POST');
-};
+//exports.product_create_post = function(req, res) {
+//    res.send('NOT IMPLEMENTED: Book create POST');
+//};
+exports.product_create_post = [
+    
+
+    // Validate and sanitize fields.
+    body('name', 'Name must not be empty.').trim().isLength({ min: 1 }).escape(),
+    body('description', 'Description must not be empty.').trim().isLength({ min: 1 }).escape(),
+    body('category', 'Category must not be empty.').trim().isLength({ min: 1 }).escape(),
+    body('quantityInStock', 'Quantity must not be empty').trim().isLength({ min: 1 }).escape(),
+    body('dateUpdated', 'Date must not be empty').trim().isLength({ min: 1 }).escape(),
+    
+
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a Book object with escaped and trimmed data.
+        var product = new Product(
+          { name: req.body.name,
+            description: req.body.description,
+            category: req.body.category,
+            price: req.body.price,
+            quantityInStock: req.body.quantityInStock,
+            dateUpdated: req.body.dateUpdated
+           });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values/error messages.
+            res.render('product_form', { title: 'Create Product', categories:results.categories, product: product, errors: errors.array() });
+            return;
+        }
+        else {
+            // Data from form is valid..
+            // Check if Genre with same name already exists.
+        Product.findOne({ 'name': req.body.name })
+        .exec( function(err, found_product) {
+           if (err) { return next(err); }
+
+           if (found_product) {
+             // Genre exists, redirect to its detail page.
+             res.redirect(found_product.url);
+           }
+           else {
+
+             product.save(function (err) {
+               if (err) { return next(err); }
+               // Genre saved. Redirect to genre detail page.
+               res.redirect(product.url);
+             });
+
+           }
+
+         });
+    }
+  }
+];
 
 // Display book delete form on GET.
 exports.product_delete_get = function(req, res) {

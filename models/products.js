@@ -10,7 +10,7 @@ var ProductSchema = new Schema(
     price: {type: Number, required: true},
     quantityInStock: { type: Number, required: true},
     dateUpdated: {type: Date},
-    idnumber: {type: Number}
+    //idnumber: {type: Number}
   }
 );
 
