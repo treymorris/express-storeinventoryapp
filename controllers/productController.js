@@ -22,9 +22,9 @@ exports.index = function(req, res) {
 // Display list of all products.
 exports.product_list = function(req, res, next) {
 
-    Product.find({}, 'name')
+    Product.find({}, 'name category price')
       .sort({name : 1})
-      .populate('description category')
+      .populate('category')
       .exec(function (err, list_products) {
         if (err) { return next(err); }
         //Successful, so render

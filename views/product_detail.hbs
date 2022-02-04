@@ -1,0 +1,9 @@
+<h1>Products: {{title}}</h1>
+<div style="margin-left:20px; margin-top:20px">
+    <h4>Products</h4>
+    <ul class="list-group">
+        {{#each product}}
+            <li class="list-group-item">{{this.name}}{{this.description}}</a></li>
+        {{/each}}
+    </ul>
+</div>
