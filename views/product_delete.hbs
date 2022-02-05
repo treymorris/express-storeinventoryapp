@@ -1,0 +1,18 @@
+<h1>{{title}}: {{product.name}}</h1>
+
+<div style='margin-left:20px;margin-top:20px'>
+    <p>Description: {{product.description}}</p> 
+    <p>Price: {{product.price}}</p>
+    <p>Quantity In Stock: {{product.quantityInStock}}</p> 
+</div>
+
+<p>Do you really want to delete this Book?</p>
+    
+<form method="POST" action="" class="mb-4">
+        <div class="form-group">
+        <input type="hidden" name="productid" class="form-control" required="true" value=productid>
+        </div>
+        <div class="text-center mb-3">
+            <input type="submit" value="Delete" class="btn-primary btn-block">
+        </div>
+</form>

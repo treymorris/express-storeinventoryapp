@@ -136,14 +136,38 @@ exports.product_create_post = [
   }
 ];
 
-// Display book delete form on GET.
-exports.product_delete_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book delete GET');
+// Display Product delete form on GET.
+//exports.product_delete_get = function(req, res) {
+//    res.send('NOT IMPLEMENTED: Book delete GET');
+//};
+exports.product_delete_get = function(req, res, next) {
+
+    Product.findById(req.params.id)
+    //.populate('book')
+    .exec(function (err, product) {
+        if (err) { return next(err); }
+        if (product==null) { // No results.
+            res.redirect('/inventory/products');
+        }
+        // Successful, so render.
+        res.render('product_delete', { title: 'Delete Product', product:  product});
+    })
+
 };
 
-// Handle book delete on POST.
-exports.product_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book delete POST');
+// Handle Product delete on POST.
+//exports.product_delete_post = function(req, res) {
+//    res.send('NOT IMPLEMENTED: Book delete POST');
+//};
+exports.product_delete_post = function(req, res, next) {
+    
+    // Assume valid Product id in field.
+    Product.findByIdAndRemove(req.body.id, function deleteProduct(err) {
+        if (err) { return next(err); }
+        // Success, so redirect to list of Products.
+        res.redirect('/inventory/products');
+        });
+
 };
 
 // Display book update form on GET.
