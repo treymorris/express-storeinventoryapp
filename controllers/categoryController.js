@@ -163,11 +163,61 @@ exports.category_delete_post = function(req, res, next) {
 };
 
 // Display Genre update form on GET.
-exports.category_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre update GET');
+//exports.category_update_get = function(req, res) {
+//    res.send('NOT IMPLEMENTED: Genre update GET');
+//};
+exports.category_update_get = function(req, res, next) {
+
+  Category.findById(req.params.id, function(err, category) {
+      if (err) { return next(err); }
+      if (category==null) { // No results.
+          var err = new Error('Category not found');
+          err.status = 404;
+          return next(err);
+      }
+      // Success.
+      res.render('category_form', { title: 'Update Category', category: category });
+  });
+
 };
 
 // Handle Genre update on POST.
-exports.category_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre update POST');
-};
+//exports.category_update_post = function(req, res) {
+//    res.send('NOT IMPLEMENTED: Genre update POST');
+//};
+exports.category_update_post = [
+   
+  // Validate and sanitze the name field.
+  body('name', 'Category name must contain at least 3 characters').trim().isLength({ min: 3 }).escape(),
+  
+
+  // Process request after validation and sanitization.
+  (req, res, next) => {
+
+      // Extract the validation errors from a request .
+      const errors = validationResult(req);
+
+  // Create a genre object with escaped and trimmed data (and the old id!)
+      var category = new Category(
+        {
+        name: req.body.name,
+        _id: req.params.id
+        }
+      );
+
+
+      if (!errors.isEmpty()) {
+          // There are errors. Render the form again with sanitized values and error messages.
+          res.render('category_form', { title: 'Update Category', category: category, errors: errors.array()});
+      return;
+      }
+      else {
+          // Data from form is valid. Update the record.
+          Category.findByIdAndUpdate(req.params.id, category, {}, function (err,thecategory) {
+              if (err) { return next(err); }
+                 // Successful - redirect to genre detail page.
+                 res.redirect(thecategory.url);
+              });
+      }
+  }
+];
