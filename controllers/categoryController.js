@@ -44,21 +44,16 @@ exports.category_detail = function(req, res, next) {
 
 };
 
-// Display Genre create form on GET.
+// Display Category create form on GET.
  exports.category_create_get = function(req, res, next) {
      res.render('category_form', { title: 'Create Category' });
    };
 
-// Display Genre create form on GET.
-//exports.category_create_get = function(req, res) {
-//   res.send('NOT IMPLEMENTED: Genre create GET');
-//};
-
-// Handle Genre create on POST.
+// Handle Category create on POST.
 exports.category_create_post =  [
 
     // Validate and sanitize the name field.
-    body('category', 'Category name required').trim().isLength({ min: 1 }).escape(),
+    body('name', 'Category name required').trim().isLength({ min: 1 }).escape(),
   
     // Process request after validation and sanitization.
     (req, res, next) => {
@@ -78,13 +73,13 @@ exports.category_create_post =  [
       }
       else {
         // Data from form is valid.
-        // Check if Genre with same name already exists.
+        // Check if Category with same name already exists.
         Category.findOne({ 'name': req.body.name })
           .exec( function(err, found_category) {
              if (err) { return next(err); }
   
              if (found_category) {
-               // Genre exists, redirect to its detail page.
+               // Category exists, redirect to its detail page.
                res.redirect(found_category.url);
              }
              else {
