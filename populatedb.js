@@ -38,17 +38,15 @@ function categoryCreate(name, cb) {
   }   );
 }
 
-function productCreate(name, description, category, price, quantityInStock, dateUpdated, _someId, cb) {
+function productCreate(name, description, price, quantityInStock, dateUpdated, category, cb) {
   productdetail = { 
     name: name,
     description: description,
-    category: category,
     price: price,
     quantityInStock: quantityInStock,
     dateUpdated: dateUpdated,
-    //idnumber: idnumber
   }
-  
+  if (category != false) productdetail.category = category
     
   var product = new Product(productdetail);    
   product.save(function (err) {
@@ -81,13 +79,13 @@ function createCategories(cb) {
 function createProducts(cb) {
     async.parallel([
         function(callback) {
-          productCreate('spaghetti', 'pasta', 'dry goods', 10, 4, new Date(), 1, callback);
+          productCreate('spaghetti', 'pasta', 10, 4, new Date(), categories[0], callback);
         },
         function(callback) {
-          productCreate('romaine', 'lettuce', 'produce', 5, 2, new Date(), 2, callback);
+          productCreate('romaine', 'lettuce', 5, 2, new Date(), categories[1], callback);
         },
         function(callback) {
-          productCreate('parmesan', '10 lb wheel', 'cheese', 15, 1, new Date(), 3, callback);
+          productCreate('parmesan', '10 lb wheel', 15, 1, new Date(), [categories[2], callback);
         },
         ],
         // optional callback

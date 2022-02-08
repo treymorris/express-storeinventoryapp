@@ -20,9 +20,9 @@ exports.index = function(req, res) {
 // Display list of all products.
 exports.product_list = function(req, res, next) {
 
-    Product.find({}, 'name category price')
+    Product.find({}, 'name category')
       .sort({name : 1})
-      .populate('category')
+        .populate('category')
       .exec(function (err, list_products) {
         if (err) { return next(err); }
         //Successful, so render
@@ -77,23 +77,14 @@ exports.product_create_get = function(req, res, next) {
 //    res.send('NOT IMPLEMENTED: Book create POST');
 //};
 exports.product_create_post = [
-    // Convert the category to an array.
-    (req, res, next) => {
-        if (!(req.body.category instanceof Array)) {
-            if (typeof req.body.category === 'undefined')
-                req.body.category = [];
-            else
-                req.body.category = new Array(req.body.category);
-        }
-        next();
-    },
-
+    
+   
     // Validate and sanitize fields.
     body('name', 'Name must not be empty.').trim().isLength({ min: 1 }).escape(),
     body('description', 'Description must not be empty.').trim().isLength({ min: 1 }).escape(),
-    body('category.*').escape(),
     body('quantityInStock', 'Quantity must not be empty').trim().isLength({ min: 1 }).escape(),
     body('dateUpdated', 'Date must not be empty').trim().isLength({ min: 1 }).escape(),
+    body('category', 'Category must not be empty').trim().isLength({ min: 1 }).escape(),
     
 
     // Process request after validation and sanitization.
@@ -110,44 +101,40 @@ exports.product_create_post = [
                 description: req.body.description,
                 category: req.body.category,
                 price: req.body.price,
-                quantityInStock: req.body.quantityInStock,
-                dateUpdated: req.body.dateUpdated
+                quantityInStock: req.body.quantity,
+                dateUpdated: req.body.date
             });
   
         if (!errors.isEmpty()) {
             // There are errors. Render the form again with sanitized values/error messages.
-            // Get all authors and genres for form.
-            async.parallel({
+             // Get all authors and genres for form.
+             async.parallel({
                 
-                categories: function (callback) {
+                categories: function(callback) {
                     Category.find(callback);
                 },
-            }, function (err, results) {
+            }, function(err, results) {
                 if (err) { return next(err); }
 
                 // Mark our selected genres as checked.
                 for (let i = 0; i < results.categories.length; i++) {
                     if (product.category.indexOf(results.categories[i]._id) > -1) {
-                        results.categories[i].checked = 'true';
+                        results.categories[i].checked='true';
                     }
                 }
-                res.render('product_form', { title: 'Create Product', product: product, categories: results.categories, errors: errors.array() });
+                res.render('product_form', { title: 'Create Product', categories:results.categories, product: product, errors: errors.array() });
             });
             return;
         }
         else {
-            // Data from form is valid.
+            // Data from form is valid. Save book.
             product.save(function (err) {
                 if (err) { return next(err); }
-                // Genre saved. Redirect to genre detail page.
-                res.redirect(product.url);
-            });
-          
+                   //successful - redirect to new book record.
+                   res.redirect(product.url);
+                });
         }
-          
     }
-              
-            
 ];
           
 // Display Product delete form on GET.

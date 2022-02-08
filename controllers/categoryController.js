@@ -3,11 +3,11 @@ var Product = require('../models/products');
 var async = require('async');
 const { body, validationResult } = require("express-validator");
 
-// Display list of all Genre.
+// Display list of all Categories.
 exports.category_list = function(req, res, next) {
 
     Category.find({}, 'name')
-      .sort({title : 1})
+      .sort({ name: 1 })
       .exec(function (err, list_categories) {
         if (err) { return next(err); }
         //Successful, so render
@@ -16,7 +16,7 @@ exports.category_list = function(req, res, next) {
   
   };
 
-// Display detail page for a specific Genre.
+// Display detail page for a specific Category.
 exports.category_detail = function(req, res, next) {
 
     async.parallel({
@@ -26,7 +26,7 @@ exports.category_detail = function(req, res, next) {
         },
 
         category_products: function(callback) {
-            Product.find({ 'category': req.params.id })
+            Product.find({ category: req.params.id })
             //Product.findById(req.params.id)
               .exec(callback);
         },
@@ -133,22 +133,22 @@ exports.category_delete_post = function(req, res, next) {
 
     async.parallel({
         category: function(callback) {
-          Category.findById(req.body.categoryid).exec(callback)
+          Category.findById(req.params.id).exec(callback)
         },
         categories_products: function(callback) {
-          Product.find({ 'category': req.body.categoryid }).exec(callback)
+          Product.find({ 'category': req.params.id }).exec(callback)
         },
     }, function(err, results) {
         if (err) { return next(err); }
         // Success
-        if (results.categories_books.length > 0) {
+        if (results.categories_products.length > 0) {
             // Author has books. Render in same way as for GET route.
             res.render('category_delete', { title: 'Delete Category', category: results.category, category_books: results.categories_products } );
             return;
         }
         else {
             // Author has no books. Delete object and redirect to the list of authors.
-            Category.findByIdAndRemove(req.body.categoryid, function deleteCategory(err) {
+            Category.findByIdAndRemove(req.params.id, function deleteCategory(err) {
                 if (err) { return next(err); }
                 // Success - go to author list
                 res.redirect('/inventory/categories')

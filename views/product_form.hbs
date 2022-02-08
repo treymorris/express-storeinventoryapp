@@ -20,9 +20,10 @@
         <label for="date">Date Created: </label>
         <input type="date" name="date" class="form-control">
     </div>
+    <label>Category: </label>
     <div class="form-group">
         {{#each categories}}
-        <label for="{{this._id}}">{{this.name}}: </label>
+        <label for="{{this._id}}">{{this.name}} </label>
         <input type="checkbox" name="category" class="checkbox-input" id="{{this._id}}" value="{{this._id}}" >
         {{/each}}
     </div>
@@ -30,9 +31,9 @@
         <input type="submit" value="Submit" class="btn-primary btn-block">
     </div>
 </form>
-{{#if errors}}
+{{#each errors}}
    <ul>
-      <li>{{error.msg}}</li>
+      <li>{{this.msg}}</li>
    </ul>
-{{/if}}
+{{/each}}
 <a href="/inventory">Home</a>
