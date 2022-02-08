@@ -76,26 +76,23 @@ exports.product_create_get = function(req, res, next) {
 //exports.product_create_post = function(req, res) {
 //    res.send('NOT IMPLEMENTED: Book create POST');
 //};
-exports.product_create_post = [
-    
-   
-    // Validate and sanitize fields.
-    body('name', 'Name must not be empty.').trim().isLength({ min: 1 }).escape(),
-    body('description', 'Description must not be empty.').trim().isLength({ min: 1 }).escape(),
-    body('quantityInStock', 'Quantity must not be empty').trim().isLength({ min: 1 }).escape(),
-    body('dateUpdated', 'Date must not be empty').trim().isLength({ min: 1 }).escape(),
-    body('category', 'Category must not be empty').trim().isLength({ min: 1 }).escape(),
-    
+exports.product_create_post =  [
 
-    // Process request after validation and sanitization.
-    (req, res, next) => {
-
-        // Extract the validation errors from a request.
-        const errors = validationResult(req);
-
-       
-        // Create a Book object with escaped and trimmed data.
-        var product = new Product(
+        // Validate and sanitize the name field.
+        body('name', 'Name must not be empty.').trim().isLength({ min: 1 }).escape(),
+        body('description', 'Description must not be empty.').trim().isLength({ min: 1 }).escape(),
+        body('quantityInStock', 'Quantity must not be empty').escape(),
+        body('dateUpdated', 'Date must not be empty').escape(),
+        body('category', 'Category must not be empty').escape(),
+      
+        // Process request after validation and sanitization.
+        (req, res, next) => {
+      
+          // Extract the validation errors from a request.
+          const errors = validationResult(req);
+      
+          // Create a genre object with escaped and trimmed data.
+          var product = new Product(
             {
                 name: req.body.name,
                 description: req.body.description,
@@ -103,40 +100,39 @@ exports.product_create_post = [
                 price: req.body.price,
                 quantityInStock: req.body.quantity,
                 dateUpdated: req.body.date
-            });
-  
-        if (!errors.isEmpty()) {
+            }
+          );
+      
+          if (!errors.isEmpty()) {
             // There are errors. Render the form again with sanitized values/error messages.
-             // Get all authors and genres for form.
-             async.parallel({
-                
-                categories: function(callback) {
-                    Category.find(callback);
-                },
-            }, function(err, results) {
-                if (err) { return next(err); }
-
-                // Mark our selected genres as checked.
-                for (let i = 0; i < results.categories.length; i++) {
-                    if (product.category.indexOf(results.categories[i]._id) > -1) {
-                        results.categories[i].checked='true';
-                    }
-                }
-                res.render('product_form', { title: 'Create Product', categories:results.categories, product: product, errors: errors.array() });
-            });
+            res.render('product_form', { title: 'Create Product', product: product, errors: errors.array()});
             return;
+          }
+          else {
+            // Data from form is valid.
+            // Check if Category with same name already exists.
+            Product.findOne({ 'name': req.body.name })
+              .exec( function(err, found_product) {
+                 if (err) { return next(err); }
+      
+                 if (found_product) {
+                   // Category exists, redirect to its detail page.
+                   res.redirect(found_product.url);
+                 }
+                 else {
+      
+                   product.save(function (err) {
+                     if (err) { return next(err); }
+                     // Genre saved. Redirect to genre detail page.
+                     res.redirect(product.url);
+                   });
+      
+                 }
+      
+               });
+          }
         }
-        else {
-            // Data from form is valid. Save book.
-            product.save(function (err) {
-                if (err) { return next(err); }
-                   //successful - redirect to new book record.
-                   res.redirect(product.url);
-                });
-        }
-    }
-];
-          
+      ];
 // Display Product delete form on GET.
 //exports.product_delete_get = function(req, res) {
 //    res.send('NOT IMPLEMENTED: Book delete GET');
@@ -163,7 +159,7 @@ exports.product_delete_get = function(req, res, next) {
 exports.product_delete_post = function(req, res, next) {
     
     // Assume valid Product id in field.
-    Product.findByIdAndRemove(req.body.id, function deleteProduct(err) {
+    Product.findByIdAndRemove(req.params.id, function deleteProduct(err) {
         if (err) { return next(err); }
         // Success, so redirect to list of Products.
         res.redirect('/inventory/products');
