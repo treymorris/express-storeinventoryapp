@@ -50,7 +50,7 @@ exports.product_detail = function(req, res, next) {
             return next(err);
         }
         // Successful, so render.
-        res.render('product_detail', { title: results.product.name, product: results.product } );
+        res.render('product_detail', { title: 'Product', product: results.product } );
     });
 
 };
@@ -168,11 +168,86 @@ exports.product_delete_post = function(req, res, next) {
 };
 
 // Display book update form on GET.
-exports.product_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book update GET');
+// exports.product_update_get = function(req, res) {
+//     res.send('NOT IMPLEMENTED: Book update GET');
+// };
+exports.product_update_get = function(req, res, next) {
+
+    // Get book, authors and genres for form.
+    async.parallel({
+        product: function(callback) {
+            Product.findById(req.params.id).populate('category').exec(callback);
+        },
+        categories: function(callback) {
+            Category.find(callback);
+        },
+        }, function(err, results) {
+            if (err) { return next(err); }
+            if (results.product==null) { // No results.
+                var err = new Error('Product not found');
+                err.status = 404;
+                return next(err);
+            }
+            // Success.
+            // Mark our selected genres as checked.
+            for (var all_g_iter = 0; all_g_iter < results.categories.length; all_g_iter++) {
+                for (var product_g_iter = 0; product_g_iter < results.product.category.length; product_g_iter++) {
+                    if (results.categories[all_g_iter]._id.toString()===results.product.category[product_g_iter]._id.toString()) {
+                        results.categories[all_g_iter].checked='true';
+                    }
+                }
+            }
+            res.render('product_form', { title: 'Update Product', categories: results.categories, product: results.product });
+        });
+
 };
 
 // Handle book update on POST.
-exports.product_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book update POST');
-};
+// exports.product_update_post = function(req, res) {
+//     res.send('NOT IMPLEMENTED: Book update POST');
+// };
+exports.product_update_post = [
+   
+    // Validate and sanitze the name field.
+    body('name', 'Name must not be empty.').trim().isLength({ min: 1 }).escape(),
+    body('description', 'Description must not be empty.').trim().isLength({ min: 1 }).escape(),
+    body('quantityInStock', 'Quantity must not be empty').escape(),
+    body('dateUpdated', 'Date must not be empty').escape(),
+    body('category', 'Category must not be empty').escape(),
+    
+  
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+  
+        // Extract the validation errors from a request .
+        const errors = validationResult(req);
+  
+    // Create a genre object with escaped and trimmed data (and the old id!)
+        var product = new Product(
+          {
+            name: req.body.name,
+            description: req.body.description,
+            category: req.body.category,
+            price: req.body.price,
+            quantityInStock: req.body.quantity,
+            dateUpdated: req.body.date,
+            _id: req.params.id
+          }
+        );
+  
+  
+        if (!errors.isEmpty()) {
+            // There are errors. Render the form again with sanitized values and error messages.
+            res.render('product_form', { title: 'Update Product', product: product, errors: errors.array()});
+        return;
+        }
+        else {
+            // Data from form is valid. Update the record.
+            Product.findByIdAndUpdate(req.params.id, product, {}, function (err,theproduct) {
+                if (err) { return next(err); }
+                   // Successful - redirect to genre detail page.
+                   res.redirect(theproduct.url);
+                });
+        }
+    }
+  ];
